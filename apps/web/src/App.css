@@ -1,42 +1,46 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+@import "tailwindcss";
+@layer base {
+  h1 {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-6);
   }
-  to {
-    transform: rotate(360deg);
+
+  h2 {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-5);
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  h3 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-gray-800);
+    margin-bottom: var(--spacing-4);
   }
-}
 
-.card {
-  padding: 2em;
-}
+  h4 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-medium);
+    color: var(--color-gray-800);
+    margin-bottom: var(--spacing-4);
+  }
 
-.read-the-docs {
-  color: #888;
+  h5 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-medium);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-3);
+  }
+
+  h6 {
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    color: var(--color-gray-700);
+    margin-bottom: var(--spacing-3);
+  }
 }
