@@ -1,11 +1,34 @@
-import express from "express"
-const app = express()
-const port = 3000
+// app.js
+import express from "express";
+import cors from "cors";
+import logger from "morgan";
+import indexRouter from "./routes/index.js";
+import blogRouter from "./routes/blog.js";
+import { connectDB } from "./utils/dbconn.js";
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+// Connect to MongoDB database
+connectDB();
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+const app = express();
+
+// Middleware
+app.use(logger("dev"));
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Routes
+app.use("/", indexRouter);
+app.use("/api/blogs", blogRouter);
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Server Error",
+    error: process.env.NODE_ENV === "development" ? err.message : {},
+  });
+});
+
+export default app;
