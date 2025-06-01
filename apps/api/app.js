@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import logger from "morgan";
 import indexRouter from "./routes/index.js";
-import blogRouter from "./routes/blog.js";
+import recipeRouter from "./routes/recipe.js";
 import { connectDB } from "./utils/dbconn.js";
 
 // Connect to MongoDB database
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use("/", indexRouter);
-app.use("/api/blogs", blogRouter);
+app.use("/api/recipe", recipeRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
