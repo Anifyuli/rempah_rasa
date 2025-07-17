@@ -52,7 +52,7 @@ router
       });
     }
   })
-  .put(async (req, res) => {
+  .patch(async (req, res) => {
     try {
       const updated = await updateRecipe(req.params.slug, req.body);
       if (!updated) {
