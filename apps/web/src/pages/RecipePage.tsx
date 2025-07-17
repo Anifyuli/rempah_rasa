@@ -1,9 +1,33 @@
-import router from "react-router";
-import { mockRecipes } from "../../mock/recipes";
+import { useNavigate } from "react-router";
 import { RecipeListContainer } from "../components/RecipeListContainer";
 import SearchInput from "../components/SearchInput";
+import axios from "../utils/axios";
+import { useEffect, useState } from "react";
+
+interface Recipe {
+  _id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  tags: string[];
+  duration_minutes: number;
+  difficulty: string;
+  views: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export default function RecipePage() {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get("/recipe")
+      .then((res) => setRecipes(res.data))
+      .catch((err) => console.error("Gagal ambil resep:", err));
+  }, []);
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white px-6 py-12">
@@ -35,11 +59,13 @@ export default function RecipePage() {
             komunitas
           </p>
           <RecipeListContainer
-            recipes={mockRecipes}
+            recipes={recipes}
             onViewRecipe={(recipe) => {
               // Navigate ke /recipe/[slug]
-              router.push(`/recipe/${recipe.slug}`);
+              navigate(`/recipes/${recipe.slug}`);
             }}
+            onToggleLike={undefined}
+            onLoadMore={undefined}
           />
         </div>
       </div>

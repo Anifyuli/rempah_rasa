@@ -29,13 +29,17 @@ export const mockRecipes = [
     "__v": 0
   },
   {
-    "_id": "123456789",
-    "title": "Rendang Daging",
-    "slug": "rendang-daging",
-    "summary": "Masakan Padang dengan bumbu rempah yang kaya dan pedas",
-    "tags": ["rendang", "pedas", "daging", "tradisional"],
-    "duration_minutes": 120,
-    "difficulty": "hard",
-    "views": 256
-  },
+    _id: "123456789",
+    title: "Rendang Daging",
+    slug: "rendang-daging",
+    summary: "Masakan Padang dengan bumbu rempah yang kaya dan pedas",
+    ingredients: ["Daging sapi", "Santan", "Bumbu rendang"],
+    steps: ["Tumis bumbu", "Masukkan daging", "Masak dengan santan hingga kering"],
+    tags: ["rendang", "pedas", "daging", "tradisional"],
+    duration_minutes: 120,
+    difficulty: "hard",
+    views: 256,
+    created_at: "2025-05-19T12:00:00.000Z",
+    updated_at: "2025-05-19T12:00:00.000Z"
+  }
 ];

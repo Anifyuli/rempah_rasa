@@ -41,8 +41,8 @@ export default function NavBar() {
           </ul>
 
           {/* CTA Button */}
-          <button
-            type="button"
+          <a
+            href="/recipes/new"
             className="relative group bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-full px-6 py-3 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
           >
             <span className="flex items-center gap-2">
@@ -50,7 +50,7 @@ export default function NavBar() {
               Tambahkan Resepmu
             </span>
             <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-          </button>
+          </a>
         </div>
       </div>
     </nav>
