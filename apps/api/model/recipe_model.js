@@ -16,6 +16,11 @@ const RecipeSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
   views: { type: Number, default: 0 },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 // Avoid duplicated model errors on reload

@@ -1,4 +1,6 @@
 import express from "express";
+import authMiddleware from "../middleware/auth.js";
+import adminMiddleware from "../middleware/admin.js";
 import {
   getAllRecipes,
   getRecipeBySlug,
@@ -12,9 +14,10 @@ const router = express.Router();
 // Routes for /api/recipe
 router
   .route("/")
+  // GET - bisa diakses tanpa login (optional auth)
   .get(async (req, res) => {
     try {
-      const recipes = await getAllRecipes();
+      const recipes = await getAllRecipes(req.user?.id || null);
       res.json(recipes);
     } catch (err) {
       res.status(500).json({
@@ -23,9 +26,14 @@ router
       });
     }
   })
-  .post(async (req, res) => {
+  // POST - wajib login
+  .post(authMiddleware, async (req, res) => {
     try {
-      const recipe = await createRecipe(req.body);
+      const recipeData = {
+        ...req.body,
+        userId: req.user.id
+      };
+      const recipe = await createRecipe(recipeData);
       res.status(201).json(recipe);
     } catch (err) {
       res.status(400).json({
@@ -40,7 +48,7 @@ router
   .route("/:slug")
   .get(async (req, res) => {
     try {
-      const recipe = await getRecipeBySlug(req.params.slug);
+      const recipe = await getRecipeBySlug(req.params.slug, req.user?.id || null);
       if (!recipe) {
         return res.status(404).json({ message: "Recipe not found" });
       }
@@ -52,11 +60,12 @@ router
       });
     }
   })
-  .patch(async (req, res) => {
+  // PATCH - wajib login
+  .patch(authMiddleware, async (req, res) => {
     try {
-      const updated = await updateRecipe(req.params.slug, req.body);
+      const updated = await updateRecipe(req.params.slug, req.body, req.user.id);
       if (!updated) {
-        return res.status(404).json({ message: "Recipe not found" });
+        return res.status(404).json({ message: "Recipe not found or unauthorized" });
       }
       res.json(updated);
     } catch (err) {
@@ -66,11 +75,12 @@ router
       });
     }
   })
-  .delete(async (req, res) => {
+  // DELETE - wajib login
+  .delete(authMiddleware, async (req, res) => {
     try {
-      const deleted = await deleteRecipe(req.params.slug);
+      const deleted = await deleteRecipe(req.params.slug, req.user.id);
       if (!deleted) {
-        return res.status(404).json({ message: "Recipe not found" });
+        return res.status(404).json({ message: "Recipe not found or unauthorized" });
       }
       res.json({ message: "Recipe successfully deleted" });
     } catch (err) {

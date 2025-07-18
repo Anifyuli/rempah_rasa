@@ -5,6 +5,7 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import recipeRouter from "./routes/recipe.js";
 import userRouter from "./routes/user.js";
+import adminRouter from "./routes/admin.js";
 import { connectDB } from "./utils/dbconn.js";
 
 // Connect to MongoDB database
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/", indexRouter);
 app.use("/api/recipe", recipeRouter);
 app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
