@@ -16,7 +16,7 @@ export default async function authMiddleware(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    
+
     // Optional: Verify user masih exist di database
     const user = await User.findById(decoded.id);
     if (!user) {
@@ -26,6 +26,12 @@ export default async function authMiddleware(req, res, next) {
     req.user = decoded;
     next();
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({
+        message: "Token expired",
+        code: "TOKEN_EXPIRED", // Frontend bisa detect ini untuk auto refresh
+      });
+    }
     return res.status(403).json({ message: "Token tidak valid" });
   }
 }

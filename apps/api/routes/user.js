@@ -3,8 +3,9 @@ import {
   changePassword,
   getProfile,
   login,
+  refreshToken,
   register,
-  updateProfile,
+  updateProfile
 } from "../controller/auth.js";
 import authMiddleware from "../middleware/auth.js";
 
@@ -18,5 +19,6 @@ router.post("/register", register);
 router.get("/profile", authMiddleware, getProfile);
 router.put("/profile", authMiddleware, updateProfile);
 router.put("/password", authMiddleware, changePassword);
+router.post("/refresh-token", authMiddleware, refreshToken);
 
 export default router;

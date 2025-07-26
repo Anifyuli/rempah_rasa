@@ -4,14 +4,23 @@ import {
   ChefHat,
   Clock,
   Eye,
-  Star,
-  Utensils,
   Pencil,
+  Star,
   Trash2,
+  UserRoundCheck,
+  UserRoundX,
+  Utensils,
 } from "lucide-react";
 import { JSX, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import axios from "../utils/axios";
+
+interface Author {
+  _id: string;
+  username: string;
+  isVerified: boolean;
+}
 
 interface Recipe {
   _id: string;
@@ -26,14 +35,18 @@ interface Recipe {
   created_at: string;
   updated_at: string;
   views: number;
+  userId: Author;
 }
 
 export default function RecipeDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [activeTab, setActiveTab] = useState<"ingredients" | "steps">("ingredients");
+  const [activeTab, setActiveTab] = useState<"ingredients" | "steps">(
+    "ingredients",
+  );
   const [loading, setLoading] = useState<boolean>(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -67,7 +80,9 @@ export default function RecipeDetailPage() {
   };
 
   const handleDelete = async () => {
-    const confirm = window.confirm("Apakah kamu yakin ingin menghapus resep ini?");
+    const confirm = window.confirm(
+      "Apakah kamu yakin ingin menghapus resep ini?",
+    );
     if (!confirm) return;
 
     try {
@@ -95,8 +110,12 @@ export default function RecipeDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-cyan-50">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Resep Tidak Ditemukan</h2>
-          <p className="text-gray-600 mb-6">Resep dengan slug "{slug}" tidak tersedia.</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Resep Tidak Ditemukan
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Resep dengan slug "{slug}" tidak tersedia.
+          </p>
           <button
             onClick={() => navigate("/recipes")}
             className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg font-medium"
@@ -109,7 +128,7 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-cyan-100">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto p-6">
         {/* Back Button */}
         <button
@@ -127,32 +146,69 @@ export default function RecipeDetailPage() {
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-2">
                 <ChefHat className="w-8 h-8" />
-                <span className="text-cyan-100 text-lg font-medium">Resep Spesial</span>
+                <span className="text-cyan-100 text-lg font-medium">
+                  Resep Spesial
+                </span>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => navigate(`/recipes/${slug}/edit`)}
-                  className="flex items-center gap-1 bg-white text-cyan-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-                >
-                  <Pencil className="w-4 h-4" />
-                  Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="flex items-center gap-1 bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Hapus
-                </button>
-              </div>
+              {user &&
+                ((typeof recipe.userId === "string" &&
+                  recipe.userId === user._id) ||
+                  (typeof recipe.userId === "object" &&
+                    recipe.userId._id === user._id)) && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/recipes/${slug}/edit`)}
+                      className="flex items-center gap-1 bg-white text-cyan-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="flex items-center gap-1 bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Hapus
+                    </button>
+                  </div>
+                )}
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">{recipe.title}</h1>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              {recipe.title}
+            </h1>
             <p className="text-lg">{recipe.summary}</p>
+
+            {/* Creator detail */}
+            <div className="mt-3 flex items-center gap-2 text-sm text-cyan-100">
+              <span>Ditulis oleh:</span>
+              <span className="font-semibold">
+                {recipe.userId.username}
+              </span>
+              {recipe.userId.isVerified ? (
+                <span className="flex items-center gap-1 bg-emerald-500/80 text-white px-2 py-0.5 rounded-full text-xs">
+                  <UserRoundCheck className="w-4 h-4" />
+                  Terverifikasi
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 bg-gray-500/40 text-gray-100 px-2 py-0.5 rounded-full text-xs">
+                  <UserRoundX className="w-4 h-4" />
+                  Belum Verifikasi
+                </span>
+              )}
+            </div>
 
             {/* Meta Info */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-              <InfoBox icon={<Clock />} label="Waktu" value={`${recipe.duration_minutes} menit`} />
-              <InfoBox icon={<Star />} label="Tingkat" value={getDifficultyText(recipe.difficulty)} />
+              <InfoBox
+                icon={<Clock />}
+                label="Waktu"
+                value={`${recipe.duration_minutes} menit`}
+              />
+              <InfoBox
+                icon={<Star />}
+                label="Tingkat"
+                value={getDifficultyText(recipe.difficulty)}
+              />
               <InfoBox icon={<Eye />} label="Views" value={`${recipe.views}`} />
               <InfoBox
                 icon={<Calendar />}
@@ -169,7 +225,10 @@ export default function RecipeDetailPage() {
         {/* Tags */}
         <div className="mb-8 flex flex-wrap gap-2">
           {recipe.tags.map((tag, i) => (
-            <span key={i} className="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm font-medium">
+            <span
+              key={i}
+              className="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm font-medium"
+            >
               #{tag}
             </span>
           ))}
@@ -177,7 +236,7 @@ export default function RecipeDetailPage() {
 
         {/* Tabs */}
         <div className="bg-white rounded-3xl shadow-md">
-          <div className="flex border-b">
+          <div className="flex">
             <TabButton
               active={activeTab === "ingredients"}
               onClick={() => setActiveTab("ingredients")}
@@ -239,10 +298,21 @@ export default function RecipeDetailPage() {
   );
 }
 
-function InfoBox({ icon, label, value }: { icon: JSX.Element; label: string; value: string }) {
+function InfoBox({
+  icon,
+  label,
+  value,
+}: {
+  icon: JSX.Element;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="bg-white/20 rounded-xl p-4 backdrop-blur-sm">
-      <div className="flex items-center gap-2 mb-1 text-white/90">{icon}<span>{label}</span></div>
+      <div className="flex items-center gap-2 mb-1 text-white/90">
+        {icon}
+        <span>{label}</span>
+      </div>
       <div className="text-lg font-semibold text-white">{value}</div>
     </div>
   );
@@ -262,8 +332,8 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`flex-1 py-3 px-4 text-sm font-semibold flex items-center justify-center gap-2 transition ${
-        active ? "bg-cyan-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+      className={`flex-1 py-3 px-4 text-sm font-semibold rounded-2xl flex items-center justify-center gap-2 transition ${
+        active ? "bg-cyan-500 text-white" : "text-gray-600 hover:bg-gray-200"
       }`}
     >
       {icon}

@@ -1,6 +1,11 @@
 import { CookingPot, Search } from "lucide-react";
 
-export default function SearchInput() {
+interface SearchInputProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export default function SearchInput({ value, onChange }: SearchInputProps) {
   return (
     <div className="flex items-center max-w-lg mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
       <div className="relative flex-1">
@@ -12,6 +17,8 @@ export default function SearchInput() {
           id="simple-search"
           className="w-full pl-12 pr-4 py-4 text-gray-700 text-base placeholder-gray-400 bg-transparent border-0 focus:ring-0 focus:outline-none"
           placeholder="Cari resep yang diinginkan..."
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           required
         />
       </div>

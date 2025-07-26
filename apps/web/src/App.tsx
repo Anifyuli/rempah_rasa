@@ -1,29 +1,66 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import NavBar from "./components/NavBar";
+
+import AdminLayout from "./layout/AdminLayout";
+import MainLayout from "./layout/MainLayout";
+
+import { useRef } from "react";
+import ProtectedRoute from "./components/ProtectedRoute";
 import AboutPage from "./pages/AboutPage";
-import HomePage from "./pages/HomePage";
-import RecipePage from "./pages/RecipePage";
-import Footer from "./components/Footer";
-import RecipeDetailPage from "./pages/RecipeDetailPage";
+import AdminDashboard from "./pages/AdminPage";
 import CreateNewOrEditRecipePage from "./pages/CreateNewOrEditRecipe";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import RecipeDetailPage from "./pages/RecipeDetailPage";
+import RecipePage from "./pages/RecipePage";
+import UserProfile from "./pages/UserPage";
 
 export default function App() {
+  const footerRef = useRef<HTMLElement | null>(null);
+
   return (
-    <>
-      <NavBar />
-      <Routes>
+    <Routes>
+      {/* Main Layout */}
+      <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/recipes" element={<RecipePage />} />
-        <Route path="/about" element={<AboutPage />} />
+        <Route path="/recipes" element={<RecipePage footerRef={footerRef} />} />
         <Route path="/recipes/:slug" element={<RecipeDetailPage />} />
-        <Route path="/recipes/new" element={<CreateNewOrEditRecipePage />} />
+        <Route
+          path="/recipes/new"
+          element={
+            <ProtectedRoute>
+              <CreateNewOrEditRecipePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/recipes/:slug/edit"
-          element={<CreateNewOrEditRecipePage />}
+          element={
+            <ProtectedRoute>
+              <CreateNewOrEditRecipePage />
+            </ProtectedRoute>
+          }
         />
-      </Routes>
-      <Footer />
-    </>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/profile" element={<UserProfile />} />
+      </Route>
+
+      {/* Admin Layout */}
+      <Route element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      {/* Not Found */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 }

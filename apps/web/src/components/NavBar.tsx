@@ -1,7 +1,22 @@
 import InteractiveLogo from "./InteractiveLogo";
-import { Plus } from "lucide-react";
+import { UserPlus, LogOut, User } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleUserProfile = async () => {
+    await navigate("/profile");
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    // Optional: redirect ke home atau login page
+    window.location.href = "/";
+  };
+
   return (
     <nav className="bg-gradient-to-r from-emerald-50 to-cyan-50 backdrop-blur-lg border-b border-emerald-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -40,17 +55,43 @@ export default function NavBar() {
             </li>
           </ul>
 
-          {/* CTA Button */}
-          <a
-            href="/recipes/new"
-            className="relative group bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-full px-6 py-3 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-          >
-            <span className="flex items-center gap-2">
-              <Plus />
-              Tambahkan Resepmu
-            </span>
-            <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-          </a>
+          {/* Auth Section */}
+          <div className="flex items-center gap-4">
+            {user ? (
+              // User sudah login - tampilkan info user dan tombol logout
+              <>
+                <button
+                  onClick={handleUserProfile}
+                  className="flex flex-row gap-1 px-6 py-3 rounded-4xl bg-gray-700 text-white transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">Halo, {user.firstName}</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="relative group bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-semibold rounded-full px-6 py-3 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </span>
+                  <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                </button>
+              </>
+            ) : (
+              // User belum login - tampilkan tombol login
+              <a
+                href="/login"
+                className="relative group bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-full px-6 py-3 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+              >
+                <span className="flex items-center gap-2">
+                  <UserPlus className="w-5 h-5" />
+                  Login
+                </span>
+                <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </nav>

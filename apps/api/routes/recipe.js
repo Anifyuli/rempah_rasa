@@ -1,6 +1,5 @@
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
-import adminMiddleware from "../middleware/admin.js";
 import {
   getAllRecipes,
   getRecipeBySlug,
@@ -12,43 +11,46 @@ import {
 const router = express.Router();
 
 // Routes for /api/recipe
-router
-  .route("/")
-  // GET - bisa diakses tanpa login (optional auth)
-  .get(async (req, res) => {
-    try {
-      const recipes = await getAllRecipes(req.user?.id || null);
-      res.json(recipes);
-    } catch (err) {
-      res.status(500).json({
-        message: "Failed to fetch recipes",
-        error: err.message,
-      });
-    }
-  })
-  // POST - wajib login
-  .post(authMiddleware, async (req, res) => {
-    try {
-      const recipeData = {
-        ...req.body,
-        userId: req.user.id
-      };
-      const recipe = await createRecipe(recipeData);
-      res.status(201).json(recipe);
-    } catch (err) {
-      res.status(400).json({
-        message: "Failed to add recipe",
-        error: err.message,
-      });
-    }
-  });
+router.get("/", async (req, res) => {
+  try {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const recipes = await getAllRecipes(search, page, limit);
+    res.json(recipes);
+  } catch (err) {
+    console.error("Gagal ambil resep:", err);
+    res.status(500).json({ message: "Gagal mengambil daftar resep" });
+  }
+});
+
+// Routes for /api/recipe
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    const recipeData = {
+      ...req.body,
+      userId: req.user.id,
+    };
+    const recipe = await createRecipe(recipeData);
+    res.status(201).json(recipe);
+  } catch (err) {
+    res.status(400).json({
+      message: "Failed to add recipe",
+      error: err.message,
+    });
+  }
+});
 
 // Routes for /api/recipe/:slug
 router
   .route("/:slug")
   .get(async (req, res) => {
     try {
-      const recipe = await getRecipeBySlug(req.params.slug, req.user?.id || null);
+      const recipe = await getRecipeBySlug(
+        req.params.slug,
+        req.user?.id || null,
+      );
       if (!recipe) {
         return res.status(404).json({ message: "Recipe not found" });
       }
@@ -63,9 +65,15 @@ router
   // PATCH - wajib login
   .patch(authMiddleware, async (req, res) => {
     try {
-      const updated = await updateRecipe(req.params.slug, req.body, req.user.id);
+      const updated = await updateRecipe(
+        req.params.slug,
+        req.body,
+        req.user.id,
+      );
       if (!updated) {
-        return res.status(404).json({ message: "Recipe not found or unauthorized" });
+        return res
+          .status(404)
+          .json({ message: "Recipe not found or unauthorized" });
       }
       res.json(updated);
     } catch (err) {
@@ -80,7 +88,9 @@ router
     try {
       const deleted = await deleteRecipe(req.params.slug, req.user.id);
       if (!deleted) {
-        return res.status(404).json({ message: "Recipe not found or unauthorized" });
+        return res
+          .status(404)
+          .json({ message: "Recipe not found or unauthorized" });
       }
       res.json({ message: "Recipe successfully deleted" });
     } catch (err) {
