@@ -15,6 +15,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
 import RecipePage from "./pages/RecipePage";
 import UserProfile from "./pages/UserPage";
+import RegisterPage from "./pages/RegisterPage";
 
 export default function App() {
   const footerRef = useRef<HTMLElement | null>(null);
@@ -34,6 +35,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/recipes/:slug/edit"
           element={

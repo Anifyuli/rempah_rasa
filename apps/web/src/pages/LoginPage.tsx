@@ -164,6 +164,18 @@ export default function LoginPage() {
               {loading ? "Masuk..." : "Masuk"}
             </button>
           </form>
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 text-sm">
+              Belum punya akun?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/register")}
+                className="text-blue-500 hover:text-blue-600 font-medium transition-colors duration-200"
+              >
+                Daftar sekarang
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>

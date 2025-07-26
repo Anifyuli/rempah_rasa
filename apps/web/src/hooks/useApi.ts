@@ -31,7 +31,7 @@ export function useApi() {
         body: JSON.stringify(postData),
         headers: { "Content-Type": "application/json" }
       });
-      
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Login failed: ${res.status} ${errorText}`);
@@ -50,6 +50,27 @@ export function useApi() {
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Refresh token failed: ${res.status} ${errorText}`);
+      }
+
+      return res.json();
+    },
+
+    register: async (postData: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      email: string;
+      password: string;
+    }): Promise<{ user: User; message: string }> => {
+      const res = await fetch("http://localhost:3000/api/user/register", {
+        method: "POST",
+        body: JSON.stringify(postData),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Register failed: ${res.status} ${errorText}`);
       }
 
       return res.json();
