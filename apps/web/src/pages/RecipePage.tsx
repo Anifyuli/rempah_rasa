@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { RecipeListContainer } from "../components/RecipeListContainer";
 import SearchInput from "../components/SearchInput";
 import axios from "../utils/axios";
@@ -18,15 +18,17 @@ interface Recipe {
   updated_at: string;
 }
 
-type RecipePageProps = {
-  footerRef: React.RefObject<HTMLElement | null>;
-};
+interface LayoutContext {
+  footerRef: React.RefObject<HTMLElement>;
+}
 
-export default function RecipePage({ footerRef }: RecipePageProps) {
+export default function RecipePage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  const { footerRef } = useOutletContext<LayoutContext>();
 
   // Ambil resep dari backend dengan query search
   const fetchRecipes = useCallback(async (query: string) => {

@@ -18,14 +18,13 @@ import UserProfile from "./pages/UserPage";
 import RegisterPage from "./pages/RegisterPage";
 
 export default function App() {
-  const footerRef = useRef<HTMLElement | null>(null);
 
   return (
     <Routes>
       {/* Main Layout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/recipes" element={<RecipePage footerRef={footerRef} />} />
+        <Route path="/recipes" element={<RecipePage />} />
         <Route path="/recipes/:slug" element={<RecipeDetailPage />} />
         <Route
           path="/recipes/new"
