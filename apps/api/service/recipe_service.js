@@ -108,15 +108,35 @@ export async function createRecipe(data) {
 }
 
 // Get all recipes dengan data yang sudah dibersihkan
-export async function getAllRecipes() {
-  const recipes = await Recipe.find().sort({ created_at: -1 });
-  return recipes.map((recipe) => cleanData(recipe.toObject()));
+export async function getAllRecipes(search = "", page = 1, limit = 10) {
+  const filter = {};
+  if (search) {
+    const regex = new RegExp(search, "i");
+    filter.$or = [
+      { title: regex },
+      { summary: regex },
+      { tags: regex },
+      { ingredients: regex },
+    ];
+  }
+
+  const recipes = await Recipe.find(filter)
+    .sort({ created_at: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return recipes.map((r) => cleanData(r.toObject()));
 }
 
 // Get a single recipe by its slug dengan data yang sudah dibersihkan
 export async function getRecipeBySlug(slug) {
-  const recipe = await Recipe.findOne({ slug });
-  return recipe ? cleanData(recipe.toObject()) : null;
+  const recipe = await Recipe.findOne({ slug }).populate(
+    "userId",
+    "username isVerified",
+  );
+
+  if (!recipe) return null;
+  return cleanData(recipe.toObject());
 }
 
 // Update a recipe dengan data yang sudah dibersihkan
@@ -135,17 +155,4 @@ export async function updateRecipe(slug, updates) {
 // Delete a recipe by its slug
 export async function deleteRecipe(slug) {
   return Recipe.findOneAndDelete({ slug });
-}
-
-// Bonus: Function untuk search recipes dengan cleaning
-export async function searchRecipes(query) {
-  const recipes = await Recipe.find({
-    $or: [
-      { title: { $regex: query, $options: "i" } },
-      { description: { $regex: query, $options: "i" } },
-      { ingredients: { $regex: query, $options: "i" } },
-    ],
-  }).sort({ created_at: -1 });
-
-  return recipes.map((recipe) => cleanData(recipe.toObject()));
 }

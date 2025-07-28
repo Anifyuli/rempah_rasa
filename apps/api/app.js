@@ -1,9 +1,11 @@
 // app.js
-import express from "express";
 import cors from "cors";
+import express from "express";
 import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import recipeRouter from "./routes/recipe.js";
+import userRouter from "./routes/user.js";
+import adminRouter from "./routes/admin.js";
 import { connectDB } from "./utils/dbconn.js";
 
 // Connect to MongoDB database
@@ -13,13 +15,19 @@ const app = express();
 
 // Middleware
 app.use(logger("dev"));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use("/", indexRouter);
 app.use("/api/recipe", recipeRouter);
+app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 
 // Error handler
 app.use((err, req, res, next) => {

@@ -1,14 +1,60 @@
-# React + Vite
+# 🥗 Rempah Rasa Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bagian frontend dari **Rempah Rasa**, dibangun menggunakan **React** & **Vite**.  
+Didesain modern dengan **Tailwind CSS** dan **TypeScript**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Fitur Utama
 
-## Expanding the ESLint configuration
+- **Autentikasi Pengguna** (login, register).
+- **Dashboard Admin** untuk manajemen resep & pengguna.
+- **Tampilan interaktif** dengan animasi & card UI.
+- **Optimasi build** menggunakan SWC.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
 
-Coba collab Syauqi
+## 🚀 Cara Menjalankan Frontend
+
+1. **Pindah ke folder web:**
+
+```bash
+cd apps/web
+```
+
+2. **Copy file environment:**
+
+```bash
+cp .env.example .env
+```
+
+   Lalu isi konfigurasi endpoint API.
+
+3. **Install dependencies:**
+
+```bash
+yarn install
+```
+
+4. **Jalankan server development:**
+
+```bash
+yarn dev
+```
+
+Frontend berjalan di: `http://localhost:5173`.
+
+---
+
+## 📌 Rencana Pengembangan
+
+* [ ] Fitur notifikasi untuk admin.
+* [ ] Penghitung views untuk resep.
+* [ ] Refactoring komponen & hooks.
+* [ ] Dukungan `.env` untuk keamanan.
+
+---
+
+## 📜 Lisensi
+
+Proyek ini dilisensikan di bawah [Apache 2.0 License](../../LICENSE).
