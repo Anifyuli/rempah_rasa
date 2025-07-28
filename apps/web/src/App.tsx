@@ -4,7 +4,6 @@ import "./App.css";
 import AdminLayout from "./layout/AdminLayout";
 import MainLayout from "./layout/MainLayout";
 
-import { useRef } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AboutPage from "./pages/AboutPage";
 import AdminDashboard from "./pages/AdminPage";

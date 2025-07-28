@@ -22,6 +22,7 @@ type AuthContextType = {
   refreshAccessToken: () => Promise<boolean>;
   setAccessToken: (token: string) => void;
   setUser: (user: User) => void;
+  getAccessToken: () => string | null; // ✅ Tambahan untuk API client
   isInitialized: boolean;
 };
 
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false); // ✅ Prevent multiple refresh calls
 
   // Load tokens dari localStorage saat init
   useEffect(() => {
@@ -52,12 +54,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(JSON.parse(savedUser));
       } catch (error) {
         console.error("Error parsing saved user:", error);
+        // Clear corrupted data
+        localStorage.removeItem("user");
       }
     }
 
     setIsInitialized(true);
 
-    // Coba refresh token jika ada
+    // Coba refresh token jika ada refresh token tapi tidak ada access token
     if (savedRefreshToken && !savedAccessToken) {
       refreshAccessToken();
     }
@@ -104,8 +108,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // ✅ Helper function untuk API client - selalu return token terbaru
+  const getAccessToken = (): string | null => {
+    return accessToken;
+  };
+
   // Refresh access token menggunakan refresh token
   const refreshAccessToken = async (): Promise<boolean> => {
+    // ✅ Prevent multiple refresh calls
+    if (isRefreshing) {
+      return false;
+    }
+
     const currentRefreshToken =
       refreshToken || localStorage.getItem("refreshToken");
 
@@ -113,6 +127,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("No refresh token available");
       return false;
     }
+
+    setIsRefreshing(true);
 
     try {
       const res = await fetch("http://localhost:3000/api/user/refresh-token", {
@@ -128,6 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (res.ok) {
         const data = await res.json();
 
+        // ✅ Update state dengan token baru
         setAccessToken(data.accessToken);
         localStorage.setItem("accessToken", data.accessToken);
 
@@ -147,13 +164,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         // Refresh token invalid/expired, logout
         console.log("Refresh token invalid, logging out");
-        logout();
+        await logout();
         return false;
       }
     } catch (error) {
       console.error("Refresh token error:", error);
-      logout();
+      await logout();
       return false;
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -167,6 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshAccessToken,
         setAccessToken,
         setUser,
+        getAccessToken,
         isInitialized,
       }}
     >

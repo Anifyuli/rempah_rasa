@@ -15,41 +15,25 @@ import type {
   UserAdminStatusData,
   LoginData,
   LoginResponse,
-  RefreshTokenResponse,
 } from "../types/api";
 
 // useApi hooks
 export function useApi() {
-  const { accessToken, refreshAccessToken } = useAuth();
-  const api = createApiClient(accessToken, refreshAccessToken);
+  const { getAccessToken, refreshAccessToken } = useAuth();
+  const api = createApiClient(getAccessToken, refreshAccessToken);
 
   return {
     // AUTH METHODS
-    login: async (postData: LoginData): Promise<LoginResponse> => {
+    login: async (loginData: LoginData): Promise<LoginResponse> => {
       const res = await fetch("http://localhost:3000/api/user/login", {
         method: "POST",
-        body: JSON.stringify(postData),
+        body: JSON.stringify(loginData),
         headers: { "Content-Type": "application/json" }
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Login failed: ${res.status} ${errorText}`);
-      }
-
-      return res.json();
-    },
-
-    refreshToken: async (refreshToken: string): Promise<RefreshTokenResponse> => {
-      const res = await fetch("http://localhost:3000/api/user/refresh-token", {
-        method: "POST",
-        body: JSON.stringify({ refreshToken }),
-        headers: { "Content-Type": "application/json" }
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Refresh token failed: ${res.status} ${errorText}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Login failed: ${res.status}`);
       }
 
       return res.json();
@@ -81,54 +65,54 @@ export function useApi() {
       const res = await api("http://localhost:3000/api/user/profile");
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Get profile failed: ${res.status} ${errorText}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Get profile failed: ${res.status}`);
       }
 
       return res.json();
     },
 
-    updateProfile: async (postData: ProfileData): Promise<{ user: User; message: string }> => {
+    updateProfile: async (profileData: ProfileData): Promise<{ user: User; message: string }> => {
       const res = await api("http://localhost:3000/api/user/profile", {
         method: "PUT",
-        body: JSON.stringify(postData),
+        body: JSON.stringify(profileData),
         headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Gagal update profil: ${res.status} ${text}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Gagal update profil: ${res.status}`);
       }
 
       return res.json();
     },
 
-    updatePassword: async (password: PasswordData): Promise<{ message: string }> => {
+    updatePassword: async (passwordData: PasswordData): Promise<{ message: string }> => {
       const res = await api("http://localhost:3000/api/user/password", {
         method: "PUT",
-        body: JSON.stringify(password),
+        body: JSON.stringify(passwordData),
         headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Gagal mengubah kata sandi: ${res.status} ${text}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Gagal mengubah kata sandi: ${res.status}`);
       }
 
       return res.json();
     },
 
     // RECIPE METHODS
-    createNewRecipe: async (postData: RecipeData): Promise<{ recipe: Recipe; message: string }> => {
+    createNewRecipe: async (recipeData: RecipeData): Promise<{ recipe: Recipe; message: string }> => {
       const res = await api("http://localhost:3000/api/recipe", {
         method: "POST",
-        body: JSON.stringify(postData),
+        body: JSON.stringify(recipeData),
         headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Create recipe failed: ${res.status} ${errorText}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Create recipe failed: ${res.status}`);
       }
 
       return res.json();
@@ -140,8 +124,8 @@ export function useApi() {
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Delete recipe failed: ${res.status} ${errorText}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Delete recipe failed: ${res.status}`);
       }
 
       return res.json();
@@ -152,8 +136,8 @@ export function useApi() {
       const res = await api("http://localhost:3000/api/admin/dashboard");
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Get dashboard stats failed: ${res.status} ${errorText}`);
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Get dashboard stats failed: ${res.status}`);
       }
 
       return res.json();
